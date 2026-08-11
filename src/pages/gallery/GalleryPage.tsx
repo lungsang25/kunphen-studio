@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Images, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, Images, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -19,11 +19,14 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { galleryApi, type GalleryAlbum } from "@/lib/api";
 import { GalleryAlbumDialog } from "@/pages/gallery/GalleryAlbumDialog";
+import { GalleryPreview } from "@/components/GalleryPreview";
+import { newImageDraft } from "@/components/MultiImageUpload";
 
 export function GalleryPage() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<GalleryAlbum | undefined>(undefined);
+  const [previewAlbum, setPreviewAlbum] = useState<GalleryAlbum | undefined>(undefined);
 
   const { data: albums, isLoading, isError, error } = useQuery({
     queryKey: ["gallery"],
@@ -152,11 +155,22 @@ export function GalleryPage() {
                     </AlertDialog>
                   </div>
                 </div>
-                <p className="truncate p-2 text-sm">
-                  {album.title || (
-                    <span className="text-muted-foreground">Untitled album</span>
-                  )}
-                </p>
+                <div className="p-2 space-y-2">
+                  <p className="truncate text-sm">
+                    {album.title || (
+                      <span className="text-muted-foreground">Untitled album</span>
+                    )}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setPreviewAlbum(album)}
+                  >
+                    <Eye className="h-3 w-3" />
+                    Preview
+                  </Button>
+                </div>
               </div>
             );
           })}
@@ -168,6 +182,17 @@ export function GalleryPage() {
         onOpenChange={setDialogOpen}
         album={editing}
       />
+
+      {previewAlbum && (
+        <GalleryPreview
+          open={!!previewAlbum}
+          onOpenChange={(open) => !open && setPreviewAlbum(undefined)}
+          title={previewAlbum.title}
+          images={previewAlbum.images.map((img) =>
+            newImageDraft(img.image_url, img.caption)
+          )}
+        />
+      )}
     </div>
   );
 }

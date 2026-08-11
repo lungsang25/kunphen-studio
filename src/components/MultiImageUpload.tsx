@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { uploadImagesToS3 } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   ACCEPTED_IMAGE_HINT,
   ACCEPTED_IMAGE_TYPES,
@@ -112,11 +112,12 @@ function SortableTile({
       </div>
 
       <div className="p-1.5">
-        <Input
+        <Textarea
           value={image.caption}
           onChange={(e) => onCaptionChange(e.target.value)}
           placeholder="Caption (optional)"
-          className="h-8 text-xs"
+          className="min-h-[3rem] text-xs resize-none"
+          rows={2}
           aria-label={`Caption for image ${index + 1}`}
         />
       </div>
