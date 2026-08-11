@@ -4,17 +4,12 @@ import { toast } from "sonner";
 
 import { uploadImageToS3 } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import {
+  ACCEPTED_IMAGE_HINT,
+  ACCEPTED_IMAGE_TYPES,
+  validateImageFile,
+} from "@/lib/images";
 import { cn } from "@/lib/utils";
-
-// Must stay in sync with ALLOWED_CONTENT_TYPES in the backend's app/services/s3.py,
-// so an unsupported file is rejected here instead of by the presign call.
-const ACCEPTED_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "image/avif",
-];
 
 const PLACEHOLDER = "/placeholder.svg";
 
@@ -30,13 +25,9 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
 
   const handleFile = useCallback(
     async (file: File) => {
-      if (!ACCEPTED_TYPES.includes(file.type)) {
-        toast.error("Use a JPG, PNG, WEBP, GIF, or AVIF image");
-        return;
-      }
-
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("Image must be smaller than 10MB");
+      const problem = validateImageFile(file);
+      if (problem) {
+        toast.error(problem);
         return;
       }
 
@@ -131,7 +122,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
     >
       <input
         type="file"
-        accept={ACCEPTED_TYPES.join(",")}
+        accept={ACCEPTED_IMAGE_TYPES.join(",")}
         onChange={handleFileInput}
         disabled={isUploading}
         className="absolute inset-0 cursor-pointer opacity-0"
@@ -148,7 +139,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
             Drop an image here or click to browse
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            JPG, PNG, WEBP, GIF, AVIF up to 10MB
+            {ACCEPTED_IMAGE_HINT}
           </p>
         </>
       )}

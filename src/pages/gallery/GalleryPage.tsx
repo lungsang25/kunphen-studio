@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Images, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -17,15 +17,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { galleryApi, type GalleryImage } from "@/lib/api";
-import { GalleryImageDialog } from "@/pages/gallery/GalleryImageDialog";
+import { galleryApi, type GalleryAlbum } from "@/lib/api";
+import { GalleryAlbumDialog } from "@/pages/gallery/GalleryAlbumDialog";
 
 export function GalleryPage() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<GalleryImage | undefined>(undefined);
+  const [editing, setEditing] = useState<GalleryAlbum | undefined>(undefined);
 
-  const { data: images, isLoading, isError, error } = useQuery({
+  const { data: albums, isLoading, isError, error } = useQuery({
     queryKey: ["gallery"],
     queryFn: galleryApi.list,
   });
@@ -33,7 +33,7 @@ export function GalleryPage() {
   const deleteMutation = useMutation({
     mutationFn: galleryApi.remove,
     onSuccess: () => {
-      toast.success("Image deleted");
+      toast.success("Album deleted");
       queryClient.invalidateQueries({ queryKey: ["gallery"] });
     },
     onError: (err) =>
@@ -45,8 +45,8 @@ export function GalleryPage() {
     setDialogOpen(true);
   };
 
-  const openEdit = (image: GalleryImage) => {
-    setEditing(image);
+  const openEdit = (album: GalleryAlbum) => {
+    setEditing(album);
     setDialogOpen(true);
   };
 
@@ -56,12 +56,13 @@ export function GalleryPage() {
         <div>
           <h1 className="text-2xl font-semibold">Gallery</h1>
           <p className="text-sm text-muted-foreground">
-            Manage the image gallery shown on the public site.
+            Manage the image gallery shown on the public site. An album can hold a
+            single image or many.
           </p>
         </div>
         <Button onClick={openAdd}>
           <Plus className="h-4 w-4" />
-          Add image
+          Add album
         </Button>
       </div>
 
@@ -81,79 +82,91 @@ export function GalleryPage() {
         </p>
       )}
 
-      {images && images.length === 0 && (
+      {albums && albums.length === 0 && (
         <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-          No images yet. Click "Add image" to add the first one.
+          No albums yet. Click "Add album" to add the first one.
         </p>
       )}
 
-      {images && images.length > 0 && (
+      {albums && albums.length > 0 && (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {images.map((image) => (
-            <div
-              key={image.id}
-              className="group overflow-hidden rounded-lg border"
-            >
-              <div className="relative aspect-video bg-muted">
-                <img
-                  src={image.image_url}
-                  alt={image.caption || "Gallery image"}
-                  className="h-full w-full object-cover"
-                />
-                <Badge className="absolute left-2 top-2">
-                  #{image.sort_order}
-                </Badge>
-                <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    onClick={() => openEdit(image)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="secondary" size="icon">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete this image?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will permanently remove
-                          {image.caption
-                            ? ` "${image.caption}"`
-                            : " the image"}{" "}
-                          from the public gallery. This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => deleteMutation.mutate(image.id)}
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+          {albums.map((album) => {
+            const count = album.images.length;
+            return (
+              <div
+                key={album.id}
+                className="group overflow-hidden rounded-lg border"
+              >
+                <div className="relative aspect-video bg-muted">
+                  <img
+                    src={album.images[0]?.image_url}
+                    alt={album.title || "Gallery album"}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                  <Badge className="absolute left-2 top-2">
+                    #{album.sort_order}
+                  </Badge>
+                  {count > 1 && (
+                    <Badge
+                      variant="secondary"
+                      className="absolute bottom-2 left-2 gap-1"
+                    >
+                      <Images className="h-3 w-3" />
+                      {count}
+                    </Badge>
+                  )}
+                  <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      onClick={() => openEdit(album)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="secondary" size="icon">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this album?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently remove
+                            {album.title ? ` "${album.title}"` : " the album"} and
+                            its {count} {count === 1 ? "image" : "images"} from the
+                            public gallery. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteMutation.mutate(album.id)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
+                <p className="truncate p-2 text-sm">
+                  {album.title || (
+                    <span className="text-muted-foreground">Untitled album</span>
+                  )}
+                </p>
               </div>
-              <p className="truncate p-2 text-sm">
-                {image.caption || (
-                  <span className="text-muted-foreground">No caption</span>
-                )}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      <GalleryImageDialog
+      <GalleryAlbumDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        image={editing}
+        album={editing}
       />
     </div>
   );

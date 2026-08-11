@@ -44,18 +44,28 @@ export interface ArticleInput {
   published_at: string | null;
 }
 
-export interface GalleryImage {
+export interface GalleryAlbumImage {
   id: number;
   image_url: string;
   caption: string;
   sort_order: number;
-  created_at: string;
 }
 
-export interface GalleryImageInput {
-  image_url: string;
-  caption: string;
+export interface GalleryAlbum {
+  id: number;
+  title: string;
   sort_order: number;
+  /** Ordered; the first image is the album cover. Never empty. */
+  images: GalleryAlbumImage[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GalleryAlbumInput {
+  title: string;
+  sort_order: number;
+  /** Order in this list is the order in the album; the server assigns sort_order. */
+  images: { image_url: string; caption: string }[];
 }
 
 export interface AnalyticsTotals {
@@ -231,15 +241,44 @@ export async function uploadImageToS3(file: File): Promise<string> {
   return public_url;
 }
 
+/**
+ * Uploads several files, at most `concurrency` at a time so a large drop doesn't fire
+ * every presign call at once. Results line up with `files` by index, and each one is
+ * settled independently so one bad file doesn't lose the rest of the batch.
+ */
+export async function uploadImagesToS3(
+  files: File[],
+  concurrency = 4
+): Promise<PromiseSettledResult<string>[]> {
+  const results = new Array<PromiseSettledResult<string>>(files.length);
+  let next = 0;
+
+  const worker = async () => {
+    while (next < files.length) {
+      const index = next++;
+      try {
+        results[index] = { status: "fulfilled", value: await uploadImageToS3(files[index]) };
+      } catch (reason) {
+        results[index] = { status: "rejected", reason };
+      }
+    }
+  };
+
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, files.length) }, worker)
+  );
+  return results;
+}
+
 export const galleryApi = {
-  list: () => apiFetch<GalleryImage[]>("/api/cms/gallery"),
-  create: (data: GalleryImageInput) =>
-    apiFetch<GalleryImage>("/api/cms/gallery", {
+  list: () => apiFetch<GalleryAlbum[]>("/api/cms/gallery"),
+  create: (data: GalleryAlbumInput) =>
+    apiFetch<GalleryAlbum>("/api/cms/gallery", {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  update: (id: number, data: GalleryImageInput) =>
-    apiFetch<GalleryImage>(`/api/cms/gallery/${id}`, {
+  update: (id: number, data: GalleryAlbumInput) =>
+    apiFetch<GalleryAlbum>(`/api/cms/gallery/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
