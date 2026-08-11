@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageUpload } from "@/components/ImageUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -203,13 +204,12 @@ export function ArticleFormPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">Image URL</Label>
-              <Input
-                id="image_url"
-                type="url"
+              <Label>Image</Label>
+              <ImageUpload
                 value={form.image_url}
-                onChange={set("image_url")}
-                placeholder="https://... or /placeholder.svg"
+                onChange={(url) =>
+                  setForm((prev) => ({ ...prev, image_url: url }))
+                }
               />
             </div>
 

@@ -6,6 +6,18 @@ import { uploadImageToS3 } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+// Must stay in sync with ALLOWED_CONTENT_TYPES in the backend's app/services/s3.py,
+// so an unsupported file is rejected here instead of by the presign call.
+const ACCEPTED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+];
+
+const PLACEHOLDER = "/placeholder.svg";
+
 interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
@@ -18,8 +30,8 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
 
   const handleFile = useCallback(
     async (file: File) => {
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please select an image file");
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        toast.error("Use a JPG, PNG, WEBP, GIF, or AVIF image");
         return;
       }
 
@@ -84,7 +96,9 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
           alt="Uploaded"
           className="h-48 w-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = "/placeholder.svg";
+            if (!e.currentTarget.src.endsWith(PLACEHOLDER)) {
+              e.currentTarget.src = PLACEHOLDER;
+            }
           }}
         />
         <Button
@@ -117,7 +131,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
     >
       <input
         type="file"
-        accept="image/*"
+        accept={ACCEPTED_TYPES.join(",")}
         onChange={handleFileInput}
         disabled={isUploading}
         className="absolute inset-0 cursor-pointer opacity-0"
@@ -134,7 +148,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
             Drop an image here or click to browse
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            PNG, JPG, WEBP, GIF up to 10MB
+            JPG, PNG, WEBP, GIF, AVIF up to 10MB
           </p>
         </>
       )}
