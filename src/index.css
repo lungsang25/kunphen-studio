@@ -4,24 +4,26 @@
 
 @layer base {
   :root {
-    --background: 30 25% 92%;
-    --foreground: 0 0% 0%;
-    --card: 30 30% 96%;
-    --card-foreground: 0 0% 0%;
+    /* Warm paper ground with crisp white cards, so content reads clearly
+       while keeping the Kunphen warmth. */
+    --background: 36 24% 95%;
+    --foreground: 20 14% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 12%;
     --primary: 345 65% 35%;
-    --primary-foreground: 30 25% 92%;
-    --secondary: 30 20% 85%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 30 20% 88%;
-    --muted-foreground: 0 0% 35%;
-    --accent: 30 25% 88%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 84.2% 60.2%;
+    --primary-foreground: 36 30% 98%;
+    --secondary: 32 18% 91%;
+    --secondary-foreground: 20 14% 18%;
+    --muted: 32 18% 93%;
+    --muted-foreground: 25 8% 42%;
+    --accent: 32 22% 91%;
+    --accent-foreground: 20 14% 18%;
+    --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 30 20% 82%;
-    --input: 30 20% 82%;
+    --border: 30 16% 87%;
+    --input: 30 16% 85%;
     --ring: 345 65% 35%;
-    --radius: 0.5rem;
+    --radius: 0.625rem;
   }
 
   * {
@@ -29,8 +31,27 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Crimson Text', serif;
-    font-weight: 600;
+    @apply bg-background text-foreground font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Page-level headings keep the Crimson Text brand voice; everything
+     else (nav, tables, forms, card titles) is Inter. */
+  h1,
+  h2 {
+    @apply font-display;
+  }
+
+  ::selection {
+    @apply bg-primary/15;
+  }
+}
+
+@layer utilities {
+  /* Opt-in serif for brand marks that aren't headings, e.g. the sidebar
+     wordmark and the login lockup. */
+  .font-brand {
+    @apply font-display font-bold tracking-tight;
   }
 }
