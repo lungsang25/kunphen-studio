@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import {
   ACCEPTED_IMAGE_HINT,
   ACCEPTED_IMAGE_TYPES,
-  validateImageFile,
+  validateImage,
+  type ImageSpec,
 } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
@@ -17,17 +18,26 @@ interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
   className?: string;
+  /** Shape requirement for the slot this image fills. Without it, any image goes. */
+  spec?: ImageSpec;
 }
 
-export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
+export function ImageUpload({
+  value,
+  onChange,
+  className,
+  spec,
+}: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFile = useCallback(
     async (file: File) => {
-      const problem = validateImageFile(file);
-      if (problem) {
-        toast.error(problem);
+      // Dimensions are checked before the presign call, so a wrongly-shaped image
+      // never reaches the bucket (nothing here can delete it again).
+      const { error, warning } = await validateImage(file, spec);
+      if (error) {
+        toast.error(error);
         return;
       }
 
@@ -36,13 +46,14 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
         const url = await uploadImageToS3(file);
         onChange(url);
         toast.success("Image uploaded successfully");
+        if (warning) toast.warning(warning);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Upload failed");
       } finally {
         setIsUploading(false);
       }
     },
-    [onChange]
+    [onChange, spec]
   );
 
   const handleDrop = useCallback(
@@ -85,7 +96,9 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
         <img
           src={value}
           alt="Uploaded"
-          className="h-48 w-full object-cover"
+          // With a spec, the preview is shown at the exact shape the site renders it.
+          style={spec ? { aspectRatio: spec.ratio } : undefined}
+          className={cn("w-full object-cover", !spec && "h-48")}
           onError={(e) => {
             if (!e.currentTarget.src.endsWith(PLACEHOLDER)) {
               e.currentTarget.src = PLACEHOLDER;
@@ -138,6 +151,11 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
           <p className="mt-2 text-sm font-medium">
             Drop an image here or click to browse
           </p>
+          {spec && (
+            <p className="mt-1 text-xs font-medium text-primary">
+              Must be {spec.label}
+            </p>
+          )}
           <p className="mt-1 text-xs text-muted-foreground">
             {ACCEPTED_IMAGE_HINT}
           </p>

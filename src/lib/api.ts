@@ -68,6 +68,24 @@ export interface GalleryAlbumInput {
   images: { image_url: string; caption: string }[];
 }
 
+export interface HeroSlide {
+  id: number;
+  image_url: string;
+  title: string;
+  subtitle: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HeroSlideInput {
+  image_url: string;
+  title: string;
+  subtitle: string;
+  is_active: boolean;
+}
+
 export interface AnalyticsTotals {
   users: number;
   sessions: number;
@@ -284,4 +302,26 @@ export const galleryApi = {
     }),
   remove: (id: number) =>
     apiFetch<void>(`/api/cms/gallery/${id}`, { method: "DELETE" }),
+};
+
+export const heroSlidesApi = {
+  list: () => apiFetch<HeroSlide[]>("/api/cms/hero-slides"),
+  create: (data: HeroSlideInput) =>
+    apiFetch<HeroSlide>("/api/cms/hero-slides", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  update: (id: number, data: HeroSlideInput) =>
+    apiFetch<HeroSlide>(`/api/cms/hero-slides/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  remove: (id: number) =>
+    apiFetch<void>(`/api/cms/hero-slides/${id}`, { method: "DELETE" }),
+  /** Position in `ids` becomes each slide's sort_order. */
+  reorder: (ids: number[]) =>
+    apiFetch<HeroSlide[]>("/api/cms/hero-slides/reorder", {
+      method: "PUT",
+      body: JSON.stringify({ ids }),
+    }),
 };

@@ -1,4 +1,11 @@
-import { Image, LayoutDashboard, LogOut, Newspaper, Pill } from "lucide-react";
+import {
+  GalleryHorizontalEnd,
+  Image,
+  LayoutDashboard,
+  LogOut,
+  Newspaper,
+  Pill,
+} from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -7,10 +14,42 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/hero-slides", label: "Hero slider", icon: GalleryHorizontalEnd },
   { to: "/medicines", label: "Medicines", icon: Pill },
   { to: "/articles", label: "Articles", icon: Newspaper },
   { to: "/gallery", label: "Gallery", icon: Image },
 ];
+
+/** A slim Tibetan-inspired flourish — a centered diamond between two fading rules —
+ *  used in place of a plain section heading in the sidebar. */
+function TibetanDivider() {
+  return (
+    <div
+      className="flex items-center gap-2 px-3 pb-3 pt-4 text-primary/55"
+      aria-hidden="true"
+    >
+      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-primary/45" />
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 16 16"
+        fill="none"
+        className="shrink-0"
+      >
+        <path
+          d="M8 1.5 14.5 8 8 14.5 1.5 8Z"
+          stroke="currentColor"
+          strokeWidth="1"
+          strokeLinejoin="round"
+          fill="currentColor"
+          fillOpacity="0.12"
+        />
+        <circle cx="8" cy="8" r="1.35" fill="currentColor" />
+      </svg>
+      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-primary/45" />
+    </div>
+  );
+}
 
 export function Layout() {
   const { profile, logout } = useAuth();
@@ -35,9 +74,7 @@ export function Layout() {
         </div>
 
         <nav className="flex-1 space-y-0.5 px-3 py-2">
-          <p className="px-3 pb-2 pt-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Manage
-          </p>
+          <TibetanDivider />
           {navItems.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}

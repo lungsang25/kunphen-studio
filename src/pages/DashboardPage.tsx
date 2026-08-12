@@ -1,6 +1,7 @@
 import {
   Activity,
   Eye,
+  GalleryHorizontalEnd,
   Image,
   MousePointerClick,
   Newspaper,
@@ -66,6 +67,12 @@ const sections = [
     title: "Gallery",
     description: "Manage gallery images",
     icon: Image,
+  },
+  {
+    to: "/hero-slides",
+    title: "Hero slider",
+    description: "Manage the homepage sliding images",
+    icon: GalleryHorizontalEnd,
   },
 ];
 

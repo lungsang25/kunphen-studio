@@ -10,6 +10,7 @@ import { ArticleFormPage } from "@/pages/articles/ArticleFormPage";
 import { ArticlesPage } from "@/pages/articles/ArticlesPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { GalleryPage } from "@/pages/gallery/GalleryPage";
+import { HeroSlidesPage } from "@/pages/hero/HeroSlidesPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { MedicineFormPage } from "@/pages/medicines/MedicineFormPage";
 import { MedicinesListPage } from "@/pages/medicines/MedicinesListPage";
@@ -41,6 +42,7 @@ export default function App() {
                     element={<ArticleFormPage />}
                   />
                   <Route path="/gallery" element={<GalleryPage />} />
+                  <Route path="/hero-slides" element={<HeroSlidesPage />} />
                 </Route>
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
