@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -17,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchInput } from "@/components/SearchInput";
 import { medicinesApi } from "@/lib/api";
 
 const PLACEHOLDER = "/placeholder.svg";
@@ -24,10 +26,18 @@ const MAX_USES = 3;
 
 export function MedicinesListPage() {
   const queryClient = useQueryClient();
+  const [query, setQuery] = useState("");
   const { data: medicines, isLoading, isError, error } = useQuery({
     queryKey: ["medicines"],
     queryFn: medicinesApi.list,
   });
+
+  const filtered = useMemo(() => {
+    if (!medicines) return [];
+    const q = query.trim().toLowerCase();
+    if (!q) return medicines;
+    return medicines.filter((med) => med.name.toLowerCase().includes(q));
+  }, [medicines, query]);
 
   const deleteMutation = useMutation({
     mutationFn: medicinesApi.remove,
@@ -48,12 +58,22 @@ export function MedicinesListPage() {
             Manage the medicine catalog shown on the public site.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/medicines/new">
-            <Plus className="h-4 w-4" />
-            Add medicine
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {medicines && medicines.length > 0 && (
+            <SearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="Search by name…"
+              className="w-44 sm:w-56"
+            />
+          )}
+          <Button asChild className="shrink-0">
+            <Link to="/medicines/new">
+              <Plus className="h-4 w-4" />
+              Add medicine
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {isLoading && (
@@ -77,9 +97,15 @@ export function MedicinesListPage() {
         </p>
       )}
 
-      {medicines && medicines.length > 0 && (
+      {medicines && medicines.length > 0 && filtered.length === 0 && (
+        <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+          No medicines match "{query}".
+        </p>
+      )}
+
+      {filtered.length > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {medicines.map((med) => (
+          {filtered.map((med) => (
             <div
               key={med.id}
               className="group flex flex-col overflow-hidden rounded-lg border bg-card"

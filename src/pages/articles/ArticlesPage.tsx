@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -17,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchInput } from "@/components/SearchInput";
 import { articlesApi } from "@/lib/api";
 
 const PLACEHOLDER = "/placeholder.svg";
@@ -31,10 +33,20 @@ function formatDate(value: string) {
 
 export function ArticlesPage() {
   const queryClient = useQueryClient();
+  const [query, setQuery] = useState("");
   const { data: articles, isLoading, isError, error } = useQuery({
     queryKey: ["articles"],
     queryFn: articlesApi.list,
   });
+
+  const filtered = useMemo(() => {
+    if (!articles) return [];
+    const q = query.trim().toLowerCase();
+    if (!q) return articles;
+    return articles.filter((article) =>
+      article.title.toLowerCase().includes(q),
+    );
+  }, [articles, query]);
 
   const deleteMutation = useMutation({
     mutationFn: articlesApi.remove,
@@ -55,12 +67,22 @@ export function ArticlesPage() {
             Manage the articles shown on the public site.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/articles/new">
-            <Plus className="h-4 w-4" />
-            Add article
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {articles && articles.length > 0 && (
+            <SearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="Search by title…"
+              className="w-44 sm:w-56"
+            />
+          )}
+          <Button asChild className="shrink-0">
+            <Link to="/articles/new">
+              <Plus className="h-4 w-4" />
+              Add article
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {isLoading && (
@@ -84,9 +106,15 @@ export function ArticlesPage() {
         </p>
       )}
 
-      {articles && articles.length > 0 && (
+      {articles && articles.length > 0 && filtered.length === 0 && (
+        <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+          No articles match "{query}".
+        </p>
+      )}
+
+      {filtered.length > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
+          {filtered.map((article) => (
             <div
               key={article.id}
               className="group flex flex-col overflow-hidden rounded-lg border bg-card"

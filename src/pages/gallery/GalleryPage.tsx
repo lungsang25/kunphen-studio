@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Images, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchInput } from "@/components/SearchInput";
 import { galleryApi, type GalleryAlbum } from "@/lib/api";
 import { GalleryAlbumDialog } from "@/pages/gallery/GalleryAlbumDialog";
 import { GalleryPreview } from "@/components/GalleryPreview";
@@ -27,11 +28,19 @@ export function GalleryPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<GalleryAlbum | undefined>(undefined);
   const [previewAlbum, setPreviewAlbum] = useState<GalleryAlbum | undefined>(undefined);
+  const [query, setQuery] = useState("");
 
   const { data: albums, isLoading, isError, error } = useQuery({
     queryKey: ["gallery"],
     queryFn: galleryApi.list,
   });
+
+  const filtered = useMemo(() => {
+    if (!albums) return [];
+    const q = query.trim().toLowerCase();
+    if (!q) return albums;
+    return albums.filter((album) => album.title.toLowerCase().includes(q));
+  }, [albums, query]);
 
   const deleteMutation = useMutation({
     mutationFn: galleryApi.remove,
@@ -63,10 +72,20 @@ export function GalleryPage() {
             single image or many.
           </p>
         </div>
-        <Button onClick={openAdd}>
-          <Plus className="h-4 w-4" />
-          Add album
-        </Button>
+        <div className="flex items-center gap-2">
+          {albums && albums.length > 0 && (
+            <SearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="Search by title…"
+              className="w-44 sm:w-56"
+            />
+          )}
+          <Button onClick={openAdd} className="shrink-0">
+            <Plus className="h-4 w-4" />
+            Add album
+          </Button>
+        </div>
       </div>
 
       {isLoading && (
@@ -91,9 +110,15 @@ export function GalleryPage() {
         </p>
       )}
 
-      {albums && albums.length > 0 && (
+      {albums && albums.length > 0 && filtered.length === 0 && (
+        <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+          No albums match "{query}".
+        </p>
+      )}
+
+      {filtered.length > 0 && (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {albums.map((album) => {
+          {filtered.map((album) => {
             const count = album.images.length;
             return (
               <div
