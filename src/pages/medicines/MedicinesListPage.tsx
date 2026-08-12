@@ -17,15 +17,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { medicinesApi } from "@/lib/api";
+
+const PLACEHOLDER = "/placeholder.svg";
+const MAX_USES = 3;
 
 export function MedicinesListPage() {
   const queryClient = useQueryClient();
@@ -62,10 +57,10 @@ export function MedicinesListPage() {
       </div>
 
       {isLoading && (
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Skeleton className="aspect-video w-full" />
+          <Skeleton className="aspect-video w-full" />
+          <Skeleton className="aspect-video w-full" />
         </div>
       )}
 
@@ -83,71 +78,91 @@ export function MedicinesListPage() {
       )}
 
       {medicines && medicines.length > 0 && (
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Tibetan name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Uses</TableHead>
-                <TableHead className="w-24 text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {medicines.map((med) => (
-                <TableRow key={med.id}>
-                  <TableCell className="font-medium">{med.name}</TableCell>
-                  <TableCell>{med.tibetan_name}</TableCell>
-                  <TableCell className="max-w-xs truncate">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {medicines.map((med) => (
+            <div
+              key={med.id}
+              className="group flex flex-col overflow-hidden rounded-lg border bg-card"
+            >
+              <div className="relative aspect-video bg-muted">
+                <img
+                  src={med.image_url || PLACEHOLDER}
+                  alt={med.name}
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    if (!e.currentTarget.src.endsWith(PLACEHOLDER)) {
+                      e.currentTarget.src = PLACEHOLDER;
+                    }
+                  }}
+                />
+              </div>
+
+              <div className="flex flex-1 flex-col gap-2 p-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <h2 className="truncate font-medium">{med.name}</h2>
+                  {med.tibetan_name && (
+                    <span className="shrink-0 font-display text-sm text-muted-foreground">
+                      {med.tibetan_name}
+                    </span>
+                  )}
+                </div>
+
+                {med.description && (
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
                     {med.description}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex max-w-xs flex-wrap gap-1">
-                      {med.uses.map((use) => (
-                        <Badge key={use}>{use}</Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link to={`/medicines/${med.id}/edit`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
+                  </p>
+                )}
+
+                {med.uses.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {med.uses.slice(0, MAX_USES).map((use) => (
+                      <Badge key={use} variant="secondary">
+                        {use}
+                      </Badge>
+                    ))}
+                    {med.uses.length > MAX_USES && (
+                      <Badge variant="secondary">
+                        +{med.uses.length - MAX_USES}
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                <div className="mt-auto flex justify-end gap-1 border-t pt-3">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={`/medicines/${med.id}/edit`}>
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </Link>
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Delete {med.name}?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently remove the medicine from the
-                              public site. This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteMutation.mutate(med.id)}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete {med.name}?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently remove the medicine from the
+                          public site. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deleteMutation.mutate(med.id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

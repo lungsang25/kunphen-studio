@@ -17,15 +17,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { articlesApi } from "@/lib/api";
+
+const PLACEHOLDER = "/placeholder.svg";
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString(undefined, {
@@ -70,10 +64,10 @@ export function ArticlesPage() {
       </div>
 
       {isLoading && (
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Skeleton className="aspect-video w-full" />
+          <Skeleton className="aspect-video w-full" />
+          <Skeleton className="aspect-video w-full" />
         </div>
       )}
 
@@ -91,73 +85,81 @@ export function ArticlesPage() {
       )}
 
       {articles && articles.length > 0 && (
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Excerpt</TableHead>
-                <TableHead>Published</TableHead>
-                <TableHead className="w-24 text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {articles.map((article) => (
-                <TableRow key={article.id}>
-                  <TableCell className="font-medium">
-                    {article.title}
-                  </TableCell>
-                  <TableCell>
-                    {article.category ? (
-                      <Badge>{article.category}</Badge>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {articles.map((article) => (
+            <div
+              key={article.id}
+              className="group flex flex-col overflow-hidden rounded-lg border bg-card"
+            >
+              <div className="relative aspect-video bg-muted">
+                <img
+                  src={article.image_url || PLACEHOLDER}
+                  alt={article.title}
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    if (!e.currentTarget.src.endsWith(PLACEHOLDER)) {
+                      e.currentTarget.src = PLACEHOLDER;
+                    }
+                  }}
+                />
+                {article.category && (
+                  <Badge className="absolute left-2 top-2">
+                    {article.category}
+                  </Badge>
+                )}
+              </div>
+
+              <div className="flex flex-1 flex-col gap-2 p-3">
+                <div className="space-y-1">
+                  <h2 className="line-clamp-2 font-medium">{article.title}</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDate(article.published_at)}
+                  </p>
+                </div>
+
+                {article.excerpt && (
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
                     {article.excerpt}
-                  </TableCell>
-                  <TableCell>{formatDate(article.published_at)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link to={`/articles/${article.id}/edit`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
+                  </p>
+                )}
+
+                <div className="mt-auto flex justify-end gap-1 border-t pt-3">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={`/articles/${article.id}/edit`}>
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </Link>
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Delete {article.title}?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently remove the article from the
-                              public site. This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteMutation.mutate(article.id)}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Delete {article.title}?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently remove the article from the
+                          public site. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deleteMutation.mutate(article.id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
