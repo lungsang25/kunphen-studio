@@ -21,7 +21,7 @@ interface HeroPreviewProps {
 
 /**
  * Reproduces the homepage hero — same 16:9 crop, gradient and type scale as
- * New-kunphen-website/src/components/HeroSlider.tsx — so an editor can see the
+ * kunphen-frontend/src/components/HeroSlider.tsx — so an editor can see the
  * actual framing before publishing. Keep the two in step when either changes.
  */
 export function HeroPreview({
