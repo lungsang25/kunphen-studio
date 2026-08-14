@@ -149,8 +149,7 @@ export function LoginPage() {
           <p className="mt-8 flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
             <ShieldCheck className="mt-px h-3.5 w-3.5 shrink-0" />
             <span>
-              Access is limited to approved Kunphen staff accounts. Contact an
-              administrator if you need access.
+              Access is limited to Kunphen admin only
             </span>
           </p>
 
