@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth";
@@ -104,80 +105,87 @@ export function LoginPage() {
             </span>
           </div>
 
-          <h2 className="text-2xl font-bold tracking-tight">Sign in</h2>
+          <Card className="p-8 shadow-sm shadow-black/[0.03]">
+            <h2 className="text-2xl font-bold tracking-tight">Sign in</h2>
 
-          <div className="mt-8">
-            {GOOGLE_CLIENT_ID ? (
-              <div className="flex justify-center [color-scheme:light]">
-                <GoogleLogin
-                  width="320"
-                  size="large"
-                  shape="rectangular"
-                  text="continue_with"
-                  logo_alignment="left"
-                  onSuccess={async (response) => {
-                    if (!response.credential) {
-                      toast.error("Google did not return a credential");
-                      return;
-                    }
-                    try {
-                      await loginWithGoogle(response.credential);
-                      navigate(from, { replace: true });
-                    } catch (err) {
-                      toast.error(
-                        err instanceof Error ? err.message : "Sign-in failed",
-                      );
-                    }
-                  }}
-                  onError={() => toast.error("Google sign-in failed")}
-                />
-              </div>
-            ) : (
-              <p className="rounded-lg border border-dashed bg-muted/60 p-4 text-center text-xs leading-relaxed text-muted-foreground">
-                Google sign-in is not configured yet. Set{" "}
-                <code className="font-mono text-[11px]">
-                  VITE_GOOGLE_CLIENT_ID
-                </code>{" "}
-                to enable it.
-              </p>
-            )}
-          </div>
-
-          <p className="mt-8 flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
-            <ShieldCheck className="mt-px h-3.5 w-3.5 shrink-0" />
-            <span>
-              Access is limited to Kunphen admin only
-            </span>
-          </p>
-
-          {DEV_AUTH_ENABLED && (
-            <div className="mt-10 rounded-lg border border-dashed bg-muted/40 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Development only
-              </p>
-              <div className="mt-3 space-y-2">
-                <Label htmlFor="dev-email" className="text-xs">
-                  Email
-                </Label>
-                <Input
-                  id="dev-email"
-                  type="email"
-                  className="h-9 bg-background"
-                  value={devEmail}
-                  onChange={(e) => setDevEmail(e.target.value)}
-                />
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3 w-full bg-background"
-                disabled={busy || !devEmail}
-                onClick={handleDevLogin}
-              >
-                {busy ? "Signing in..." : "Continue as dev user"}
-              </Button>
+            <div className="mt-6">
+              {GOOGLE_CLIENT_ID ? (
+                <div className="flex justify-center [color-scheme:light]">
+                  <GoogleLogin
+                    width="288"
+                    size="large"
+                    shape="rectangular"
+                    text="continue_with"
+                    logo_alignment="left"
+                    onSuccess={async (response) => {
+                      if (!response.credential) {
+                        toast.error("Google did not return a credential");
+                        return;
+                      }
+                      try {
+                        await loginWithGoogle(response.credential);
+                        navigate(from, { replace: true });
+                      } catch (err) {
+                        toast.error(
+                          err instanceof Error
+                            ? err.message
+                            : "Sign-in failed",
+                        );
+                      }
+                    }}
+                    onError={() => toast.error("Google sign-in failed")}
+                  />
+                </div>
+              ) : (
+                <p className="rounded-lg bg-muted/60 p-4 text-center text-xs leading-relaxed text-muted-foreground">
+                  Google sign-in is not configured yet. Set{" "}
+                  <code className="font-mono text-[11px]">
+                    VITE_GOOGLE_CLIENT_ID
+                  </code>{" "}
+                  to enable it.
+                </p>
+              )}
             </div>
-          )}
+
+            {DEV_AUTH_ENABLED && (
+              <>
+                <div className="my-6 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    Development only
+                  </span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dev-email" className="text-xs">
+                    Email
+                  </Label>
+                  <Input
+                    id="dev-email"
+                    type="email"
+                    className="h-9"
+                    value={devEmail}
+                    onChange={(e) => setDevEmail(e.target.value)}
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 w-full"
+                  disabled={busy || !devEmail}
+                  onClick={handleDevLogin}
+                >
+                  {busy ? "Signing in..." : "Continue as dev user"}
+                </Button>
+              </>
+            )}
+          </Card>
+
+          <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+            Access is limited to Kunphen admin only
+          </p>
         </div>
       </main>
     </div>
