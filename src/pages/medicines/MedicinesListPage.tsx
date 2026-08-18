@@ -133,6 +133,27 @@ export function MedicinesListPage() {
                   )}
                 </div>
 
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {med.category && (
+                    <Badge variant="outline">{med.category}</Badge>
+                  )}
+                  <Badge
+                    variant="outline"
+                    className={
+                      med.in_stock
+                        ? "text-emerald-700"
+                        : "text-destructive"
+                    }
+                  >
+                    {med.in_stock ? "In stock" : "Out of stock"}
+                  </Badge>
+                  {med.price > 0 && (
+                    <span className="text-sm font-medium">
+                      €{med.price.toFixed(2)}
+                    </span>
+                  )}
+                </div>
+
                 {med.description && (
                   <p className="line-clamp-2 text-sm text-muted-foreground">
                     {med.description}

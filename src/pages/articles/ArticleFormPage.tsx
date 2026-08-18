@@ -19,6 +19,7 @@ const EMPTY_FORM: ArticleInput = {
   title: "",
   slug: "",
   category: "",
+  author: "",
   excerpt: "",
   content: "",
   image_url: "",
@@ -64,6 +65,7 @@ export function ArticleFormPage() {
         title: existing.title,
         slug: existing.slug,
         category: existing.category,
+        author: existing.author,
         excerpt: existing.excerpt,
         content: existing.content,
         image_url: existing.image_url,
@@ -177,19 +179,29 @@ export function ArticleFormPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="published_at">Published at</Label>
+                <Label htmlFor="author">Author</Label>
                 <Input
-                  id="published_at"
-                  type="datetime-local"
-                  value={publishedAtInput}
-                  onChange={(e) => setPublishedAtInput(e.target.value)}
+                  id="author"
+                  value={form.author}
+                  onChange={set("author")}
+                  placeholder="Dr. Pema Yangchen"
                 />
-                {!isEdit && (
-                  <p className="text-xs text-muted-foreground">
-                    Leave empty to publish immediately.
-                  </p>
-                )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="published_at">Published at</Label>
+              <Input
+                id="published_at"
+                type="datetime-local"
+                value={publishedAtInput}
+                onChange={(e) => setPublishedAtInput(e.target.value)}
+              />
+              {!isEdit && (
+                <p className="text-xs text-muted-foreground">
+                  Leave empty to publish immediately.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

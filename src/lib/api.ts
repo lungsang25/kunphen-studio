@@ -8,6 +8,11 @@ export interface Medicine {
   full_description: string;
   image_url: string;
   uses: string[];
+  category: string;
+  price: number;
+  in_stock: boolean;
+  dosage: string;
+  notes: string;
   created_at: string;
   updated_at: string;
 }
@@ -19,6 +24,11 @@ export interface MedicineInput {
   full_description: string;
   image_url: string;
   uses: string[];
+  category: string;
+  price: number;
+  in_stock: boolean;
+  dosage: string;
+  notes: string;
 }
 
 export interface Article {
@@ -26,6 +36,7 @@ export interface Article {
   title: string;
   slug: string;
   category: string;
+  author: string;
   excerpt: string;
   content: string;
   image_url: string;
@@ -38,6 +49,7 @@ export interface ArticleInput {
   title: string;
   slug: string;
   category: string;
+  author: string;
   excerpt: string;
   content: string;
   image_url: string;

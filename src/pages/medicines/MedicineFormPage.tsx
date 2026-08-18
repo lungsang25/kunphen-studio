@@ -13,6 +13,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { medicinesApi, type MedicineInput } from "@/lib/api";
 
+const CATEGORIES = [
+  "Mental well-being",
+  "Joints & mobility",
+  "Circulation",
+  "Digestive",
+  "Respiratory",
+];
+
 const EMPTY_FORM: MedicineInput = {
   name: "",
   tibetan_name: "",
@@ -20,6 +28,11 @@ const EMPTY_FORM: MedicineInput = {
   full_description: "",
   image_url: "",
   uses: [],
+  category: "",
+  price: 0,
+  in_stock: true,
+  dosage: "",
+  notes: "",
 };
 
 export function MedicineFormPage() {
@@ -46,6 +59,11 @@ export function MedicineFormPage() {
         full_description: existing.full_description,
         image_url: existing.image_url,
         uses: existing.uses,
+        category: existing.category,
+        price: existing.price,
+        in_stock: existing.in_stock,
+        dosage: existing.dosage,
+        notes: existing.notes,
       });
       setUsesText(existing.uses.join(", "));
     }
@@ -165,6 +183,82 @@ export function MedicineFormPage() {
                 onChange={(e) => setUsesText(e.target.value)}
                 placeholder="Anxiety & Stress Relief, Insomnia"
               />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <select
+                  id="category"
+                  value={form.category}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, category: e.target.value }))
+                  }
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">Select a category</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Price (€)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.price}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      price: e.target.valueAsNumber || 0,
+                    }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="in_stock">Availability</Label>
+                <label
+                  htmlFor="in_stock"
+                  className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm shadow-sm"
+                >
+                  <input
+                    id="in_stock"
+                    type="checkbox"
+                    checked={form.in_stock}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, in_stock: e.target.checked }))
+                    }
+                    className="h-4 w-4 rounded border-input"
+                  />
+                  {form.in_stock ? "In stock" : "Out of stock"}
+                </label>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="dosage">Dosage</Label>
+                <Input
+                  id="dosage"
+                  value={form.dosage}
+                  onChange={set("dosage")}
+                  placeholder="2 pills with warm water in the evening"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Input
+                  id="notes"
+                  value={form.notes}
+                  onChange={set("notes")}
+                  placeholder="Best taken away from strong stimulants"
+                />
+              </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">

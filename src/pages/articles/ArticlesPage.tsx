@@ -141,6 +141,7 @@ export function ArticlesPage() {
                 <div className="space-y-1">
                   <h2 className="line-clamp-2 font-medium">{article.title}</h2>
                   <p className="text-xs text-muted-foreground">
+                    {article.author && `${article.author} · `}
                     {formatDate(article.published_at)}
                   </p>
                 </div>
