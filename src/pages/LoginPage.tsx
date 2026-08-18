@@ -41,7 +41,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[1.05fr_1fr]">
+    <div className="theme-fixed-light min-h-screen bg-background text-foreground lg:grid lg:grid-cols-[1.05fr_1fr]">
       {/* Brand panel — desktop only */}
       <aside className="relative hidden overflow-hidden bg-primary p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between">
         <div
@@ -105,9 +105,6 @@ export function LoginPage() {
           </div>
 
           <h2 className="text-2xl font-bold tracking-tight">Sign in</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Use your authorized Google account to continue.
-          </p>
 
           <div className="mt-8">
             {GOOGLE_CLIENT_ID ? (

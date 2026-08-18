@@ -54,6 +54,31 @@
     color-scheme: dark;
   }
 
+  /* Re-asserts the light palette regardless of an ancestor .dark class.
+     The sign-in screen is the app's public face and always uses the
+     original maroon-on-paper branding — it must not inherit whatever
+     theme the user last left the authenticated app in. */
+  .theme-fixed-light {
+    --background: 36 24% 95%;
+    --foreground: 20 14% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 12%;
+    --primary: 345 65% 35%;
+    --primary-foreground: 36 30% 98%;
+    --secondary: 32 18% 91%;
+    --secondary-foreground: 20 14% 18%;
+    --muted: 32 18% 93%;
+    --muted-foreground: 25 8% 42%;
+    --accent: 32 22% 91%;
+    --accent-foreground: 20 14% 18%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30 16% 87%;
+    --input: 30 16% 85%;
+    --ring: 345 65% 35%;
+    color-scheme: light;
+  }
+
   * {
     @apply border-border;
   }

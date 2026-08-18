@@ -1,6 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { Toaster } from "sonner";
 
 import { Layout } from "@/components/Layout";
@@ -19,9 +25,17 @@ import { useTheme } from "@/lib/theme";
 const queryClient = new QueryClient();
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
-export default function App() {
+/** Toasts are rendered in a portal outside the routed page, so they can't
+ *  pick up the login page's forced-light scope from CSS alone — this keeps
+ *  them in sync with whichever theme is actually on screen. */
+function ThemedToaster() {
   const { theme } = useTheme();
+  const location = useLocation();
+  const toastTheme = location.pathname === "/login" ? "light" : theme;
+  return <Toaster richColors position="top-right" theme={toastTheme} />;
+}
 
+export default function App() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID || "not-configured"}>
       <QueryClientProvider client={queryClient}>
@@ -50,8 +64,8 @@ export default function App() {
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            <ThemedToaster />
           </BrowserRouter>
-          <Toaster richColors position="top-right" theme={theme} />
         </AuthProvider>
       </QueryClientProvider>
     </GoogleOAuthProvider>
