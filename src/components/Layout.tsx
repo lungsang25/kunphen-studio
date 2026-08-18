@@ -9,7 +9,9 @@ import {
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -53,6 +55,7 @@ function TibetanDivider() {
 
 export function Layout() {
   const { profile, logout } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -95,8 +98,14 @@ export function Layout() {
           ))}
         </nav>
 
-        <div className="border-t px-5 py-3">
-          <p className="text-[11px] text-muted-foreground">
+        <div className="border-t px-3 py-3">
+          <div className="flex items-center justify-between rounded-md px-2 py-1.5">
+            <span className="text-sm font-medium text-muted-foreground">
+              {theme === "dark" ? "Dark mode" : "Light mode"}
+            </span>
+            <ThemeToggle />
+          </div>
+          <p className="mt-2 px-2 text-[11px] text-muted-foreground">
             Kunphen Tibetan Medical Centre
           </p>
         </div>
@@ -111,6 +120,7 @@ export function Layout() {
           </div>
 
           <div className="ml-auto flex items-center gap-3">
+            <ThemeToggle className="sm:hidden" />
             <div className="hidden text-right sm:block">
               <div className="text-sm font-medium leading-tight">
                 {profile?.name || "Admin"}

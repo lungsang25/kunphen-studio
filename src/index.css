@@ -24,6 +24,34 @@
     --input: 30 16% 85%;
     --ring: 345 65% 35%;
     --radius: 0.625rem;
+    color-scheme: light;
+  }
+
+  /* Warm charcoal ground rather than true black, and an off-white
+     foreground rather than pure white — a softer, lower-glare contrast
+     that's easier on the eyes in low light. The accent swaps from the
+     light theme's maroon to a saffron gold, echoing the maroon-and-gold
+     of Tibetan monastic dress, so it reads as warm rather than alert-red
+     against a dark ground. */
+  .dark {
+    --background: 20 14% 9%;
+    --foreground: 36 20% 92%;
+    --card: 20 13% 12%;
+    --card-foreground: 36 20% 92%;
+    --primary: 40 75% 55%;
+    --primary-foreground: 30 30% 11%;
+    --secondary: 20 12% 16%;
+    --secondary-foreground: 36 15% 88%;
+    --muted: 20 12% 15%;
+    --muted-foreground: 30 8% 62%;
+    --accent: 20 12% 18%;
+    --accent-foreground: 36 15% 90%;
+    --destructive: 0 62% 52%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 20 12% 20%;
+    --input: 20 12% 22%;
+    --ring: 40 75% 55%;
+    color-scheme: dark;
   }
 
   * {
@@ -34,6 +62,17 @@
     @apply bg-background text-foreground font-sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Applied to <html> for ~300ms while the theme is switched, so the
+     whole app cross-fades instead of hard-cutting to the new palette. */
+  .theme-transition,
+  .theme-transition * {
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease,
+      fill 0.25s ease !important;
   }
 
   /* Page-level headings keep the Crimson Text brand voice; everything

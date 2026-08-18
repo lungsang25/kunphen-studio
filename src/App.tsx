@@ -14,11 +14,14 @@ import { HeroSlidesPage } from "@/pages/hero/HeroSlidesPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { MedicineFormPage } from "@/pages/medicines/MedicineFormPage";
 import { MedicinesListPage } from "@/pages/medicines/MedicinesListPage";
+import { useTheme } from "@/lib/theme";
 
 const queryClient = new QueryClient();
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
 export default function App() {
+  const { theme } = useTheme();
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID || "not-configured"}>
       <QueryClientProvider client={queryClient}>
@@ -48,7 +51,7 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="top-right" theme={theme} />
         </AuthProvider>
       </QueryClientProvider>
     </GoogleOAuthProvider>
