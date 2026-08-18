@@ -1,18 +1,13 @@
 import {
   Activity,
   Eye,
-  GalleryHorizontalEnd,
-  Image,
   MousePointerClick,
-  Newspaper,
-  Pill,
   RefreshCw,
   TrendingDown,
   TrendingUp,
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   Area,
   AreaChart,
@@ -47,33 +42,6 @@ const RANGE_OPTIONS = [
   { days: 7, label: "7 days" },
   { days: 28, label: "28 days" },
   { days: 90, label: "90 days" },
-];
-
-const sections = [
-  {
-    to: "/medicines",
-    title: "Medicines",
-    description: "Manage the medicine catalog",
-    icon: Pill,
-  },
-  {
-    to: "/articles",
-    title: "Articles",
-    description: "Write and publish articles",
-    icon: Newspaper,
-  },
-  {
-    to: "/gallery",
-    title: "Gallery",
-    description: "Manage gallery images",
-    icon: Image,
-  },
-  {
-    to: "/hero-slides",
-    title: "Hero slider",
-    description: "Manage the homepage sliding images",
-    icon: GalleryHorizontalEnd,
-  },
 ];
 
 function formatNumber(n: number) {
@@ -370,23 +338,6 @@ export function DashboardPage() {
           </div>
         </>
       )}
-
-      <div>
-        <h2 className="mb-3 text-lg font-semibold">Manage content</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sections.map(({ to, title, description, icon: Icon }) => (
-            <Link key={to} to={to}>
-              <Card className="h-full transition-colors hover:border-primary/50">
-                <CardHeader>
-                  <Icon className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle>{title}</CardTitle>
-                  <CardDescription>{description}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
